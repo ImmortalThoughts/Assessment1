@@ -1,0 +1,61 @@
+﻿@model Assesment1.Models.OrderDetailsVM
+@{
+//Layout = "";
+}
+<html>
+<head>
+
+</head>
+<body>
+    <form id="EditForm">
+        <lable>Order Details ID</lable>
+        @Html.TextBoxFor(m=>m.OrderDetailID,new { @readonly="readonly"})
+        <br />
+        <lable>Product ID</lable>
+        @Html.TextBoxFor(m => m.ProductId, new { @readonly = "readonly" })
+        <br />
+        <lable>Product Name</lable>
+        @Html.TextBoxFor(m => m.ProductName, new { @readonly = "readonly" })
+        <br />
+        <lable>Price</lable>
+        @Html.TextBoxFor(m => m.Price)
+        <br />
+        <lable>Quantity</lable>
+        @Html.TextBoxFor(m => m.Quantity)
+        <br />
+        <lable>Total Price</lable>
+        @Html.TextBoxFor(m => m.TotalPrice, new { @readonly = "readonly" })
+        <br />
+        <button type="button" class="btn btn-Primary" style="box-shadow:2px 5px black; " data-dismiss="modal" id="saveBtnOnEdit">Save</button>
+        <button type="button" class="btn btn-secondary" style="box-shadow:2px 5px black; " data-dismiss="modal">Close</button>
+    </form>
+    @*<div>
+        <table class="table table-bordered">
+            <tr>
+                <th>OrderDetails ID</th>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total Price</th>
+            </tr>
+            <tbody id="editProductData">
+                <tr>
+                    @foreach (var item in Model.OrderDetailsList)
+                    {
+                        <td id="OrderDetailId"> @item.OrderDetailID</td>
+                        <td id="ProductID"> @item.ProductId</td>
+                        <td id="ProductName"> @item.ProductName </td>
+                        <td id="Price"><input type="text" value="@item.Price"></td>
+                        <td id="Quantity"><input type="text" value="@item.Quantity"></td>
+                        <td id="TotalPrice">@item.TotalPrice"</td>
+                        <td><a href="#" id="saveBtnOnEdit">Save</a></td>
+                    }
+                </tr>
+
+            </tbody>
+        </table>
+    </div>*@
+</body>
+</html>
+

@@ -1,0 +1,84 @@
+﻿@model Assesment1.Models.CustomersVM
+@{
+//Layout = "";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    @*<meta name="viewport" content="width=device-width" />*@
+    <title>AddCustomer</title>
+   
+    <script src="~/scripts/jquery-3.6.3.js"></script>
+
+    @*<link href="~/Content/bootstrap.min.css" rel="stylesheet" />*@
+</head>
+<body>
+    <h2>Add Customer</h2>
+    <div> 
+       
+            <form id="formAddCustomer">
+                <div>
+                    <label>Customer First Name</label>
+                    @Html.TextBoxFor(m => m.Firstname, new { @class = "form-control" })
+                </div>
+                <div>
+                    <label>Customer Last Name</label>
+                    @Html.TextBoxFor(m => m.Lastname, new { @class = "form-control" })
+                </div>
+                <div>
+                    <label>Enter Phone Number</label>
+                    @Html.TextBoxFor(m => m.PhoneNo, new { @class = "form-control" })
+                </div>
+                <div>
+                    <label>Enter Your Address</label>
+                    @Html.TextAreaFor(m => m.Address, new { @class = "form-control" })
+                </div>
+                <div>
+                    <label>Enter Your City Name</label>
+                    @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                </div>
+                <div>
+                    <label>Enter Your Post Code</label>
+                    @Html.TextBoxFor(m => m.Postcode, new { @class = "form-control" })
+                </div>
+                <br /><br />
+                <input type="button" class="btn btn-success"value="Save" id="btnSave" />
+                <input type="button" class="btn btn-danger"value="Cancel" id="btnCancel" />
+            </form>
+        
+    </div>
+    <script>
+        //$(document).on("click", "#btnSave", function () {
+        //    debugger;
+        //    var form_data = $("#formAddCustomer").serialize();
+            
+        //    $.ajax({
+        //        url: "/Orders/AddCustomers",
+        //        type: "POST",
+        //        data: form_data,
+        //        datatype:"Json"
+        //    });
+        //});
+        $("#btnSave").click(function () {
+            debugger;
+            var form_data = $("#formAddCustomer").serialize();
+
+            $.ajax({
+                url: "/Orders/AddCustomers",
+                type: "POST",
+                data: form_data,
+                error: function (er) {
+                    document.write(er.message())    
+                }
+                
+            });
+        })
+
+        $(document).on("click", "#btnCancel", function () {
+            location.href = '@Url.Action("Index","Orders")';
+        })
+    </script>
+</body>
+</html>

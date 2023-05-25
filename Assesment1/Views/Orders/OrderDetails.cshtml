@@ -1,0 +1,448 @@
+﻿@model Assesment1.Models.OrderDetailsVM
+@{
+//Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Order Details</title>
+    <script src="~/scripts/jquery-3.6.3.js"></script>
+    <script src="~/scripts/bootstrap.min.js"></script>
+</head>
+<body>
+    <h2>Order Details</h2>
+    <div>
+        <br /> 
+        <form id="formOrderDetails">
+
+            <div class="table">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label>Order Id</label>
+                        @Html.TextBoxFor(m => m.OrderId, new { @class = "form-control", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label>Customer First Name</label>
+                        @Html.TextBoxFor(m => m.Firstname, new { @class = "form-control" })
+                    </div>
+                    <div class="col-lg-6">
+                        <label>Customer Last Name</label>
+                        @Html.TextBoxFor(m => m.Lastname, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label>Order Date</label>
+                        @*@Html.TextBoxFor(m => m.OrderDateFromStr, new { @class = "form-control" })*@
+                        <input type="datetime-local" id="OrderDateFromStr" value="@Model.OrderDateFromStr" name="OrderDateFromStr"class="form-control"/>
+                    </div>
+                    <div class="col-lg-6">
+                        <label>Delivery Date</label>
+                        @*@Html.TextBoxFor(m => m.DeliveryDateStr, new { @class = "form-control" })*@
+                        <input type="datetime-local" id="DeliveryDateStr" value="@Model.DeliveryDateStr" class="form-control" />
+                    </div>
+                </div>
+            </div>
+           @Html.HiddenFor(m=>m.CustomerID)
+
+            <input type="button" class="btn btn-success" id="addProductBtn" value="Add Product" style="box-shadow:2px 5px black; "/>
+            <br />     
+            <br />        
+            <div>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Order Details ID</th>
+                        <th>Product ID</th>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <th>Update OR Delete</th>
+                    </tr>
+                    <tbody id="OrderDetailsTableBody">
+
+                    </tbody>
+                </table>
+            </div>
+            <input type="button" class="btn btn-warning" style="box-shadow:2px 5px black; " value="Save" id="saveBtn" onclick="InsertionOperation()"/>
+            <input type="button" class="btn btn-danger"style="box-shadow:2px 5px black; " value="Cancel" id="cancelBtn" onclick="location.href='@Url.Action("Index")'"/>
+        </form>
+    </div>
+    @*  *@
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Select Product</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="selectProductID">
+                
+                </div>
+                <div class="modal-footer">
+                    @*<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>*@
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*  *@
+
+    @*  *@
+
+    <div class="modal fade" id="editModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Select Product</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="editModelID">
+
+                </div>
+                <div class="modal-footer">
+                    @*<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>*@
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*  *@
+    <script>
+        $(document).ready(function () {
+            debugger;
+            var form_data = $("#formOrderDetails").serialize();
+            $.ajax({
+                type: "POST",
+                url: "/Orders/OrderDetailsData",
+                datatype: "Json",
+                data: form_data,
+                success: function (data) {
+                    var items = '';
+                    $.each(data.OrderDetailsList, function (i, item) {
+                        var rows = "<tr>"
+                         + "<td>" + item.OrderDetailID + "</td>"
+                         + "<td>" + item.ProductId + "</td>"
+                         + "<td >" + item.ProductName + "</td>"
+                         + "<td ><span>" + item.Price + "</span><input type='text' id='Price' value="+ item.Price +" style='display:none;'></td>"
+                         + "<td ><span>" + item.Quantity + "</span><input type='text' id='Quantity' value="+ item.Quantity +" style='display:none;'></td>"
+                         + "<td ><span class='totalPrice'>" + item.TotalPrice + "</span></td>"
+                         //+ "<td ><a href='#' value="+ item.OrderDetailID +" class='editBtn'>Edit</a></td>"
+                         +"<td><a class='Edit' href='#'>Edit</a><a class='Update' href='#' style='display:none;'>Update</a>&nbsp;&nbsp;&nbsp;<a id='CancelEdt' href='#' style='display:none;'>Cancel</a><a class='Delete' href='#'>Delete</a></td>"
+                         //+ "<td><a href='#'>Delete</a></td>"
+                         + "</tr>";
+                        $('#OrderDetailsTableBody').append(rows);
+                    });
+
+                    
+                }
+            });
+        });
+
+        $(document).on("click",".Edit",function(){
+            var row = $(this).closest("tr");
+            
+            $("td",row).each(function(){
+                if($(this).find("input").length>0)
+                {
+                    $(this).find("input").show();
+                    $(this).find("span").hide();
+                }
+            });
+            row.find(".Update").show();
+            row.find("#CancelEdt").show();
+            row.find(".Delete").hide();
+            $(this).hide();
+        });
+
+        $(document).on("click",".Update",function(){
+            var row=$(this).closest("tr");
+
+            $("td",row).each(function(){
+              
+                if($(this).find("input").length>0)
+                {
+                    var span=$(this).find("span");
+                    var input=$(this).find("input");
+                    span.html(input.val());
+                    span.show();
+                    input.hide();
+                }              
+            });
+            debugger;
+            var num1 = row.find("#Price").val();
+            var num2 = row.find("#Quantity").val();
+            $(row).find(".totalPrice").text(parseInt(num1)*parseInt(num2));
+            row.find(".Edit").show();
+            row.find(".Delete").show();
+            row.find("#CancelEdt").hide();
+            $(this).hide();
+        });
+
+        //$("#CancelEdt").click(function () {
+
+        //    var span = $(this).find("span");
+        //    var input = $(this).find("input");
+        //    span.show();
+        //    input.hide();
+        //})
+
+        $(document).on("click", ".Delete", function () {
+            $(this).parents("tr").remove();
+        });
+        $(document).on("click", "#CancelEdt", function () {
+            debugger;
+            var row = $(this).closest("tr");
+
+            $("td", row).each(function () {
+                if ($(this).find("input").length > 0) {
+                    $(this).find("input").hide();
+                    $(this).find("span").show();
+                }
+            });
+            row.find(".Update").hide();
+            row.find("#CancelEdt").hide();
+            row.find(".Delete").show();
+            row.find(".Edit").show();
+            $(this).hide();
+        });
+        //$(document).on("click",".editBtn",function(){
+        //    debugger;
+        //    $.ajax({
+        //        url:"/Orders/_Edit",
+        //        datatype:"html",
+        //        data:{OrderDetailsID:$(this).attr("value")},
+        //        type:"POST",
+        //        success:function(data)
+        //        {
+        //            $("#editModelID").html(data);
+        //            $("#editModal").modal("show");
+        //        }
+        //    })
+        //});
+
+        //$(document).on("click","#saveBtnOnEdit",function(){
+        //    debugger;
+        
+
+        //    //var row = "<tr>"
+           
+        //    //+ "<td></td>"
+        //    // + "<td class='BookID'>"+ $(this).val() +"</td>"
+        //    //+ "<td class='BookName'>"+ $(this).attr("name") + "</td>"
+        //    //+ "<td ><input type='text' class='BookQty" + $(this).val() + "'/></td>"
+        //    //+ "<td ><button type='button' id='bookRemoveBtn' value='" + 0 + "'>Remove</button></td>"
+        //    //+ "</tr>"
+        //    //$("#OrderDetailsTableBody").push(row);
+        //    var saveEditData=$("#EditForm").serialize();
+        //    $.ajax({
+        //        url:"/Orders/Edit",
+        //        type:"POST",
+        //        data:saveEditData,
+        //        datatype:"Json",
+        //        success:function(data){
+        //            var items = '';
+        //            $.each(data, function (i, item) {
+        //                var rows = "<tr>"
+        //                 + "<td>" + item.OrderDetailID + "</td>"
+        //                 + "<td>" + item.ProductId + "</td>"
+        //                 + "<td >" + item.ProductName + "</td>"
+        //                 + "<td >" + item.Price + "</td>"
+        //                 + "<td >" + item.Quantity + "</td>"
+        //                 + "<td>" + item.TotalPrice + "</td>"
+        //                 + "<td ><a href='#' value="+ item.OrderDetailID +" class='editBtn'>Edit</a></td>"
+        //                 + "<td><a href='#'>Delete</a></td>"
+        //                 + "</tr>";
+        //                $('#OrderDetailsTableBody').append(rows);
+        //            });
+
+        //        }
+        //    });
+        //});
+        //function editData()
+        //{
+        //    debugger;
+         
+        //        $.ajax({
+        //            url:"/Orders/Edit",
+        //            type:"POST",
+        //            data:{OrderDetailsID:$(".editBtn").attr("value")},
+        //            datatype:"Json",
+        //            success:function(data){
+        //                var items = '';
+        //                $.each(data, function (i, item) {
+        //                    var rows = "<tr>"
+        //                     + "<td id='orderDetailID'>" + item.OrderDetailID + "</td>"
+        //                     + "<td id='productId'>" + item.ProductId + "</td>"
+        //                     + "<td >" + item.ProductName + "</td>"
+        //                     + "<td >" + item.Price + "</td>"
+        //                     + "<td ><input type='text' value=" + item.Quantity + "></td>"
+        //                     + "<td><input type='text' value=" + item.TotalPrice + "></td>"
+        //                     + "<td><a href='#' id='saveBtnOnEdit'>Save</a></td>"
+        //                     + "</tr>";
+        //                    $('#editProductData').append(rows);
+        //                });
+        //            }                
+        //        });
+           
+        //}
+       
+        $(document).on("click", "#addProductBtn", function () {   
+            debugger;
+            $.ajax({
+                url:"/Orders/_AddProduct",
+                datatype:"html",
+                type:"POST",
+                success:function(data)
+                {
+                    $("#selectProductID").html(data);
+                    $("#exampleModal").modal("show");
+                }
+            })
+        });
+
+        function LoadData()
+        {
+            debugger;
+            var searchData = $("#addProductFormData").serializeArray();
+           
+            $('#addProductData td').remove();
+            $.ajax({
+                type: "POST",
+                url: "/Orders/AddProduct",
+                data:searchData,
+                datatype: "Json",
+                success: function (data) {
+                    var items = '';
+                    $.each(data.productList, function (i, item) {
+                        var rows = "<tr>"
+                         + "<td class='ProductID' value=" + item.ProductID + ">" + item.ProductID + "</td>"
+                         + "<td class='ProductName' value=" + item.ProductName + ">" + item.ProductName + "</td>"
+                         + "<td class='Price' value=" + item.Price + ">" + item.Price + "</td>"
+                         + "<td><input type='text' class='Quantity" + item.ProductID + "'/></td>"
+                         + "<td><a href='#' id='selectItemBtn' ProductID=" + item.ProductID + " ProductName=" + item.ProductName + " Price=" + item.Price + ">Select</a></td>"
+                         + "</tr>";
+                        $('#addProductData').append(rows);
+                    });
+
+                    if (data.TotalCount) {
+                        debugger;
+                        $('#customPager2').empty();
+                        $("#customPager2").append('<li id="prev"><a href="#">Prev<<<&nbsp;&nbsp;</a></li>');
+
+                        for (var row = 1; row <= (data.TotalCount) ; row++) {
+                            if (row == $("#PageNumber").val()) {
+                                $('#customPager2').append('<li id="actFun" value="' + row + '"><a href="#" class="active">' + row + '&nbsp;&nbsp</a></li>');
+                            }
+                            else {
+                                $('#customPager2').append('<li id="actFun" value="' + row + '"><a href="#" class="pageList">' + row + '&nbsp;&nbsp</a></li>');
+                            }
+
+                        }
+                        $("#customPager2").append('<li id="next" value="' + data.TotalCount + '"><a href="#">&nbsp;&nbsp;>>>Next</a></li>');
+                    }
+                }
+            });
+        }
+
+        $(document).on("click", "#selectItemBtn", function () {
+            debugger;
+            var ProductID = $(this).attr("ProductID");
+            var qty = $(".Quantity" + ProductID + "").val();
+            var row = "<tr>"
+               + "<td></td>"
+                + "<td class='ProductID'>" + $(this).attr("ProductID") + "</td>"
+               + "<td class='ProductName'>" + $(this).attr("ProductName") + "</td>"
+               + "<td class='Price'>" + $(this).attr("Price") + "</td>"
+                + "<td class='Quantity'>" +qty+ "</td>"
+                 + "<td >" + qty * $(this).attr("Price") + "</td>"
+               + "<td ><button type='button' id='bookRemoveBtn' value='" + 0 + "'>Remove</button></td>"
+               + "</tr>"
+            $("#OrderDetailsTableBody").append(row);
+        });
+        function prevFun() {
+            if ($("#PageNumber").val() > 1) {
+                $("#PageNumber").val($("#PageNumber").val() - 1);
+                LoadData();
+            }
+            else {
+                $('#prev').hide();
+            }
+        }
+        $(document).on("click", "#bookRemoveBtn", function () {
+            debugger;
+            $(this).parents("tr").remove();
+
+        });
+        function nextFun(temp) {
+            debugger;
+            if ($("#PageNumber").val() < temp) {
+                $("#PageNumber").val(parseInt($("#PageNumber").val()) + 1);
+                LoadData();
+            }
+            else {
+                $('#next').hide();
+            }
+        }
+
+        $(document).on("click", "#prev", function () {
+            prevFun();
+        });
+
+        $(document).on("click", "#next", function () {
+            var total = $(this).val();
+            nextFun(total);
+        });
+
+        $(document).on("click", "#actFun", function () {
+            debugger;
+            var row = $(this).val();
+            $("#PageNumber").val(row);
+            LoadData();
+        });
+
+
+        function InsertionOperation() {
+            debugger;
+
+            var form_details = $("#formOrderDetails").serialize();
+            var form_data = [];
+            
+            $("#OrderDetailsTableBody tr").each(function () {
+                var OrderDetails = {};             
+                OrderDetails.OrderDetailID = $(this).find("td").eq(0).html();
+                OrderDetails.ProductID = $(this).find("td").eq(1).html();
+                //OrderDetails.ProductName = $(this).find("td").eq(2).val();
+                OrderDetails.Price = $(this).find("td").eq(3).text();
+                OrderDetails.Quantity = $(this).find("td").eq(4).text();
+                OrderDetails.OrderId=$("#OrderId").val();
+                OrderDetails.CustomerID=$("#CustomerID").val();
+                form_data.push(OrderDetails)
+            });
+ 
+            var data = { OrderID: $("#OrderId").val(), CustomerID: $("#CustomerID").val(), OrderDateFromStr: $("#OrderDateFromStr").val(), DeliveryDateStr: $("#DeliveryDateStr").val() }
+            $.ajax({
+                type: "POST",
+                url: "/Orders/EditOperationXML",
+                //data: { Details: form_data, obj: data, deleteBookIssueDetailsID: IssueDetailsIDArr },
+                data: { Details: form_data, obj: data },
+                dataType: "json"     
+            });
+        }
+
+    </script>
+</body>
+</html>

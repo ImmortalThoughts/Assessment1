@@ -1,0 +1,88 @@
+﻿@model Assesment1.Models.ProductsVM
+    @{ 
+        Layout = "";
+    }
+<html>
+<head>
+    <style>
+        .active {
+            color: black;
+            background-color: red;
+        }
+
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <form id="addProductFormData">
+        <div>
+            <label>Select Product Category:</label>
+            @Html.DropDownListFor(m => m.ProductCategoryID, new SelectList(Model.ProductCategoryList, "ProductCategoryID", "CategoryName"), "--Select Category--", new { @class = "form-control" })
+        </div>
+        <div>
+            <label>Enter Page Size</label>
+            @Html.DropDownListFor(m => m.PageSize, new List<SelectListItem>
+                    { new SelectListItem{Text="3", Value="3",Selected =true },
+                    new SelectListItem{Text="5", Value="5" }, new SelectListItem{Text="10", Value="10" }}, new { @class = "form-control" })
+        </div>
+        <div>
+            @Html.HiddenFor(m => m.PageNumber)
+        </div>
+        <div>
+            <label>Enter Product Name:</label>
+            @Html.TextBoxFor(m => m.ProductName, new { @class = "form-control" })
+        </div>
+        @*<div>
+            <label>Enter Product Quantity:</label>
+            @Html.TextBoxFor(m => m.Quantity, new { @class = "form-control" })
+        </div>*@
+        <br />
+        <div>
+            <input type="button" class="btn btn-primary"value="Search" id="btnSearch" style="box-shadow:2px 5px black; " />
+            <input type="button" class="btn btn-danger" value="Reset" id="btnReset" style="box-shadow:2px 5px black; " />
+        </div>
+    </form>
+    <br />
+    <div>
+        <table class="table table-bordered">
+            <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+            <tbody id="addProductData">
+
+            </tbody>
+        </table>
+        <div id="customPager2" class="pagination">
+
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#PageNumber").val(1);
+            LoadData();
+            $("#btnReset").click(function () {
+                debugger;
+                $("#addProductFormData")[0].reset();
+                $("#ProductName").val(null);
+                $("#Quantity").val(null);              
+                $("#PageNumber").val(1);
+                LoadData();
+            });
+
+            $("#btnSearch").click(function () {
+                debugger;
+                LoadData();
+            });
+            $('#PageSize').change(function () {
+                $("#PageNumber").val(1);
+                LoadData();
+            });
+        });      
+    </script>
+</body>
+</html>
